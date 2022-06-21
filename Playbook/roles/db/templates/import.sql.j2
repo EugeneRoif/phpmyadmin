@@ -1,0 +1,8 @@
+
+CREATE DATABASE myapp;
+USE myapp;
+CREATE TABLE experts (id INT, name VARCHAR(40),email VARCHAR(40));
+INSERT INTO experts (id,name,email) VALUES (1,"Moshe","moshe@example.com"),(2,"David","david@example.com"),(3,"Papo","papo@example.com"),(4,"Gate","gate@example.com");
+
+grant all privileges on myapp.* TO '{{ mysql_user }}'@'%' identified by '{{ mysql_user_password }}';
+FLUSH PRIVILEGES;

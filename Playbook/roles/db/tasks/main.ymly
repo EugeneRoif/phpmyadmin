@@ -1,0 +1,19 @@
+---
+- name: Install a list of packages
+  apt:
+    update_cache: yes
+    state: latest
+    pkg:
+    - mysql-server
+
+- name: Get path
+  local_action:
+    ansible.builtin.shell: echo $PWD
+    register: pwd
+
+- name: replace line
+  lineinfile: 
+    path: "{{ pwd.stdout }}/roles/web/defaults/main.yml" 
+    regexp: '^(.*)phpmyadmin_mysql_host(.*)$' 
+    line: "phpmyadmin_mysql_host: {{ ansible_ssh_host }}" 
+

@@ -1,0 +1,60 @@
+---
+- name: Install a list of packages
+  apt:
+    update_cache: yes
+    state: latest
+    pkg:
+    - apache2
+    - phpmyadmin
+    - php-mbstring
+    - php-zip
+    - php-gd
+    - php-json
+    - php-curl
+
+- name: Enable mbstring
+  ansible.builtin.shell: sudo phpenmod mbstring
+
+- name: Copy the phpmyadmin.conf from our installation to Apache’s conf-available directory.
+  ansible.builtin.shell: sudo cp /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
+
+- name: Enable the configuration using a2enconf command.
+  ansible.builtin.shell: sudo a2enconf phpmyadmin
+
+- name: Ensure phpMyAdmin config file is included in Apache config.
+  lineinfile:
+    dest: /etc/apache2/apache2.conf
+    state: present
+    regexp: "^Include.+phpmyadmin.+$"
+    line: "Include /etc/phpmyadmin/apache.conf"
+    insertafter: "EOF"
+    mode: 0644
+  notify: Restart apache
+
+- name: Define phpmyadmin_config_file.
+  set_fact:
+    phpmyadmin_config_file: "{{ __phpmyadmin_config_file }}"
+  when: phpmyadmin_config_file is not defined
+
+- name: Add default username and password for MySQL connection.
+  lineinfile: >
+    dest={{ phpmyadmin_config_file }}
+    state=present
+    regexp="^.+\['{{ item.key }}'\].+$"
+    line="$cfg['Servers'][$i]['{{ item.key }}'] = '{{ item.value }}';"
+    insertbefore="^\?>"
+    mode=0644
+  with_items:
+    - key: host
+      value: "{{ phpmyadmin_mysql_host }}"
+    - key: port
+      value: "{{ phpmyadmin_mysql_port }}"
+    - key: socket
+      value: "{{ phpmyadmin_mysql_socket }}"
+    - key: connect_type
+      value: "{{ phpmyadmin_mysql_connect_type }}"
+    - key: user
+      value: "{{ mysql_user }}"
+    - key: password
+      value: "{{ mysql_user_password }}"
+  notify: Restart apache

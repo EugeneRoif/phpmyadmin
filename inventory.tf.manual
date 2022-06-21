@@ -1,0 +1,9 @@
+resource "local_file" "hosts_cfg" {
+  content = templatefile("hosts.tpl",
+    {
+      web = [for o in module.create_web_instances : o.public_ip]
+      db = [for o in module.create_db_instances : o.public_ip]
+    }
+  )
+  filename = "Playbook/hosts.cfg"
+}

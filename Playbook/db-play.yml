@@ -1,0 +1,10 @@
+---
+- name: Install DB Servers
+  become: yes
+  hosts: db
+  vars:
+    - mysql_user: "{{ lookup('env', 'mysql_user') }}"
+    - mysql_user_password: "{{ lookup('env', 'mysql_user_password') }}"
+  roles:
+    - db
+  

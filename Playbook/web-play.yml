@@ -1,0 +1,10 @@
+---
+- name: Install Web Servers
+  become: yes
+  hosts: web
+  vars:
+    db_host: 10.99.0.232
+    mysql_user: "{{ lookup('env', 'mysql_user') }}"
+    mysql_user_password: "{{ lookup('env', 'mysql_user_password') }}"
+  roles:
+    - web

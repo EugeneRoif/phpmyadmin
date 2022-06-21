@@ -1,0 +1,29 @@
+---
+- name: Install a list of packages
+  apt:
+    update_cache: yes
+    state: latest
+    pkg:
+    - mariadb-server
+
+- name: Copy template file
+  ansible.builtin.template:
+    src: import.sql.j2
+    dest: /tmp/import.sql
+
+- name: Import SQL
+  ansible.builtin.shell: sudo mysql -u root < /tmp/import.sql
+  ignore_errors: yes
+
+- name: Delete file
+  ansible.builtin.shell: rm -f /tmp/import.sql
+
+- name: Enable access to mysqld
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^bind-address'
+    line: 'bind-address = 0.0.0.0'
+  notify:
+    - Restart mysqld
+
+

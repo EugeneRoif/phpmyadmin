@@ -1,0 +1,8 @@
+---
+phpmyadmin_mysql_host: "{{ db_host }}"
+phpmyadmin_mysql_port: ""
+phpmyadmin_mysql_socket: ""
+phpmyadmin_mysql_connect_type: tcp
+phpmyadmin_mysql_user: root
+phpmyadmin_mysql_password: "{{ mysql_root_password }}"
+__phpmyadmin_config_file: /etc/phpmyadmin/config.inc.php
